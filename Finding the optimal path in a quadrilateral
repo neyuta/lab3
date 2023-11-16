@@ -1,0 +1,68 @@
+#include <iostream>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+void findOptimalPath(vector<vector<int>>& triangle, int n)
+{
+    vector<vector<int>> dp;
+    dp.resize(n);
+    for (int i = 0; i < n; i++) {
+        dp[i].resize(i + 1);
+    }
+
+    for (int i = 0; i < n; i++) {
+        dp[n - 1][i] = triangle[n - 1][i];
+    }
+
+    for (int i = n - 2; i >= 0; i--) {
+        for (int j = 0; j <= i; j++) {
+            dp[i][j] = min(dp[i + 1][j], dp[i + 1][j + 1]) + triangle[i][j];
+        }
+    }
+
+    cout << "Minimum total value of loads: " << dp[0][0] << endl;
+
+    int row = 0, col = 0;
+    vector<int> path;
+    path.push_back(triangle[row][col]);
+
+    while (row < n - 1) {
+        if (dp[row + 1][col] < dp[row + 1][col + 1]) {
+            row++;
+        }
+        else {
+            row++;
+            col++;
+        }
+        path.push_back(triangle[row][col]);
+    }
+
+    cout << "The optimal way: ";
+    for (int i = 0; i < path.size(); i++) {
+        cout << path[i] << " ";
+    }
+    cout << endl;
+}
+
+int main()
+{
+    int n;
+    cout << "Enter the number of rows in the quadrilateral: ";
+    cin >> n;
+
+    vector<vector<int>> triangle;
+    triangle.resize(n);
+    for (int i = 0; i < n; i++) {
+        triangle[i].resize(i + 1);
+        cout << "Enter the load values for the row " << i + 1 << ": ";
+        for (int j = 0; j <= i; j++) {
+            cin >> triangle[i][j];
+        }
+    }
+
+    findOptimalPath(triangle, n);
+
+    return 0;
+}
