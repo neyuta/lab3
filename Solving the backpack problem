@@ -1,0 +1,79 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+vector<int> knapsack(int W, const vector<int>& weights, const vector<int>& values) {
+    int n = weights.size();
+    vector<vector<int>> dp(n + 1, vector<int>(W + 1, 0));
+    vector<vector<bool>> selectedItems(n + 1, vector<bool>(W + 1, false));
+
+    for (int i = 1; i <= n; i++) {
+        for (int w = 1; w <= W; w++) {
+            if (weights[i - 1] <= w) {
+                int includeItem = values[i - 1] + dp[i - 1][w - weights[i - 1]];
+                int excludeItem = dp[i - 1][w];
+
+                if (includeItem > excludeItem) {
+                    dp[i][w] = includeItem;
+                    selectedItems[i][w] = true;
+                }
+                else {
+                    dp[i][w] = excludeItem;
+                }
+            }
+            else {
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+
+    vector<int> selectedIndexes;
+    int i = n, w = W;
+    while (i > 0 && w > 0) {
+        if (selectedItems[i][w]) {
+            selectedIndexes.push_back(i - 1);
+            w -= weights[i - 1];
+        }
+        i--;
+    }
+
+    return selectedIndexes;
+}
+
+int main() {
+    int W;
+    cout << "Enter the maximum possible weight of the backpack: ";
+    cin >> W;
+
+    int n;
+    cout << "Enter the number of items: ";
+    cin >> n;
+
+    vector<int> weights(n);
+    vector<int> values(n);
+
+    cout << "Enter the item weights: ";
+    for (int i = 0; i < n; i++) {
+        cin >> weights[i];
+    }
+
+    cout << "Enter the utility of the items: ";
+    for (int i = 0; i < n; i++) {
+        cin >> values[i];
+    }
+
+    vector<int> selectedItemsIndexes = knapsack(W, weights, values);
+
+    int totalValue = 0;
+    cout << "It is necessary to put items with indexes in the backpack: ";
+    for (int i : selectedItemsIndexes) {
+        cout << i << " ";
+        totalValue += values[i];
+    }
+    cout << endl;
+
+    cout << "Maximum possible total utility: " << totalValue << endl;
+
+    return 0;
+}
