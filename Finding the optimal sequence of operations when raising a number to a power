@@ -1,0 +1,66 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+
+using namespace std;
+
+vector<char> optimalSequence(int n, vector<int>& dp) {
+    if (n == 0) return {}; 
+
+    vector<char> sequence;
+    if (dp[n] != -1) return dp[n]; 
+
+    int minOperations = INT_MAX;
+
+    for (int i = 1; i <= 3; i++) {
+        vector<char> subSequence;
+
+        if (i == 1 && n > 0) {
+            subSequence = optimalSequence(n - 1, dp);
+        }
+        else if (i == 2 && n % 2 == 0) {
+            subSequence = optimalSequence(n / 2, dp);
+        }
+        else if (i == 3 && n % 3 == 0) {
+            subSequence = optimalSequence(n / 3, dp);
+        }
+        else continue;
+
+        if (subSequence.size() < minOperations) {
+            minOperations = subSequence.size();
+            sequence = subSequence;
+        }
+    }
+
+    if (n - 1 >= 0 && minOperations != INT_MAX) {
+        sequence.push_back('1');
+    }
+    else if (n % 2 == 0 && minOperations != INT_MAX) {
+        sequence.push_back('2');
+    }
+    else if (n % 3 == 0 && minOperations != INT_MAX) {
+        sequence.push_back('3');
+    }
+
+    dp[n] = sequence;
+
+    return sequence;
+}
+
+int main() {
+    int n;
+    cout << "Enter the degree of the number: ";
+    cin >> n;
+
+    vector<int> dp(n + 1, -1); 
+
+    vector<char> sequence = optimalSequence(n, dp);
+
+    cout << "Optimal number of operations: " << sequence.size() << endl;
+    cout << "Operations: ";
+    for (char operation : sequence) {
+        cout << operation;
+    }
+
+    return 0;
+}
